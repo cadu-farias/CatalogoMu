@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Criando Itens - Rivaldo</title>
+    <script>
+        document.addEventListener('gesturestart', function (event) {
+        event.preventDefault(); // Previne zoom em gestos de pinça
+        });
+
+        document.addEventListener('keydown', function (event) {
+        // Bloqueia zoom com Ctrl+ ou Ctrl-
+        if ((event.ctrlKey && (event.key === '+' || event.key === '-'))) {
+            event.preventDefault();
+        }
+        });
+
+    </script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
