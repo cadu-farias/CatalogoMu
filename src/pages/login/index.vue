@@ -113,7 +113,6 @@
 
     try {
         const userLogado = await authUserControllers.entrarComEmailESenha(email.value, password.value);
-        console.log(userLogado);
 
         // Redireciona diretamente após login
         if (userLogado) {

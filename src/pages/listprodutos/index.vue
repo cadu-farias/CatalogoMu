@@ -77,7 +77,7 @@
                   <v-col cols="12" md="12">
                     <v-text-field v-model="editedItem.video" label="Link Vídeo"></v-text-field>
                   </v-col>
-                  <v-col cols="12" md="12">
+                  <v-col cols="12" md="6">
                     <v-select
                     v-model="editedItem.categoria_id"
                     label="Select"
@@ -88,6 +88,9 @@
                     persistent-hint
                     single-line
                     ></v-select>
+                  </v-col>
+                  <v-col cols="12" md="6">
+                    <v-switch label="Destacar" v-model="editedItem.destaque" inset></v-switch>
                   </v-col>
                 </v-row>
               </v-container>
@@ -127,7 +130,7 @@
 <script setup lang="ts">
 import { CategoryProducts } from '@/models/entities/CategoryProducts';
 import { Products } from '@/models/entities/Products';
-import { ref,inject, computed, watch,onUnmounted } from 'vue';
+import { ref,inject, computed, watch,onUnmounted, onBeforeUnmount } from 'vue';
 import { IProductsControllers } from '@/controllers/interfaces/IProductsControllers';
 
   const productsControllers = inject<IProductsControllers>('productsControllers');
@@ -197,13 +200,12 @@ watch(
   
   () => editedItem.value.categoria_id,
   (newId) => {
-    console.log(editedItem)
-    console.log(newId)
+
     if(categorias.value != undefined){
       const selectedCategory = categorias.value.find(
         (categoria) => categoria.id_category === newId
       );
-      select.value = selectedCategory || { id_category: '', nome: 'Selecione' };
+      select.value = selectedCategory || { id_category: '', nome: 'Selecione', index:0 };
     }
   }
 );
@@ -220,18 +222,18 @@ watch(dialogDelete, (val) => {
 // Métodos
 const initialize = async () => {
   await productsControllers.lerTodasCategorias('cadastroiCategorias', (categories:CategoryProducts[]) => {
-        console.log(categories);
+
         categorias.value = categories; // Atualiza automaticamente o array de categorias
     });
 
   await productsControllers.getAllProducts('lerProdutos', (products:Products[])=>{
-    console.log(products)
+
     desserts.value = products
   })
 };
 
 const editItem = (item:Products) => {
-  console.log(select.value)
+
   editedIndex.value = true
   editedItem.value = item
   dialog.value = true;
@@ -245,6 +247,7 @@ const deleteItem = (item:Products) => {
 
 const deleteItemConfirm = async() => {
   loading.value = true;
+  await productsControllers.addCountProducts(editedItem.value.categoria_id, 2)
   await productsControllers.deleteProduct(editedItem.value.id_prod)
   closeDelete();
   loading.value = false;
@@ -277,7 +280,10 @@ onUnmounted(() => {
   productsControllers.stopListeningProducts('lerProdutos')
   productsControllers.stopListeningCategory('cadastroiCategorias')
 });
-
+onBeforeUnmount(()=>{
+    productsControllers.stopListeningProducts('lerProdutos')
+    productsControllers.stopListeningCategory('cadastroiCategorias')
+})
 // Inicialização
 initialize();
 </script>

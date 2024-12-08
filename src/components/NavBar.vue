@@ -1,6 +1,6 @@
 <template>
     <nav class="ma-0 ma-sm-0 mb-md-16 mb-lg-16 mb-xxl-16">
-      <v-app-bar v-if="size" :elevation="2" extension>
+      <v-app-bar v-if="size || usuario == null" :elevation="2" extension>
         <v-app-bar-nav-icon v-if="usuario" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <v-app-bar-title>
           <v-btn icon size="48" href="/">

@@ -9,7 +9,8 @@ import {
     collection,
     onSnapshot,
     query,
-    getDoc
+    getDoc,
+    orderBy
 } from "firebase/firestore";
 
 export class FirebaseProductsRepository implements IProductsRepository{
@@ -25,7 +26,6 @@ export class FirebaseProductsRepository implements IProductsRepository{
         if (docSnap.exists()) {
             // Acessar o único documento retornado (se houver)
             const doc = docSnap // Primeiro documento
-            console.log(doc.id, "=>", doc.data());
             return this.mapProductsFirebase(doc.id, doc.data().nome, doc.data().img, doc.data().video, doc.data().valor, doc.data().categoria_id, doc.data().destaque)
           }
     }
@@ -44,8 +44,7 @@ export class FirebaseProductsRepository implements IProductsRepository{
         key: string,
         updateCallback: (produtos: Products[]) => void
     ): Promise<void> {
-        console.log('updateCallback:', updateCallback);
-        const q = query(collection(db, "Products"));
+        const q = query(collection(db, "Products"), orderBy('destaque', "desc"));
         let produtos: Products[] = []; // Tipando corretamente como CategoryProducts[]
     
         return new Promise((resolve, reject) => {

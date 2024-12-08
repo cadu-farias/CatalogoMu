@@ -1,4 +1,12 @@
 <template>
+    <v-alert
+    :text="msg.text"
+    :title="msg.title"
+    :type="msg.type"
+    :closable="true"
+    close-delay="200"
+    v-if="ativarMsg"
+  ></v-alert>
     <v-data-table
       :headers="headers"
       v-model:search="search"
@@ -8,7 +16,9 @@
     >
       <template v-slot:top>
         <v-card>
-         <v-toolbar flat><v-toolbar-title>Listagem Categorias</v-toolbar-title></v-toolbar>
+         <v-toolbar flat><v-toolbar-title>Listagem Categorias</v-toolbar-title>
+        <DragDrop :items="desserts" />
+        </v-toolbar>
         </v-card>
         <v-divider inset :opacity="0.1"></v-divider>
         <v-toolbar flat>
@@ -81,9 +91,10 @@
   </template>
   
   <script setup lang="ts">
+  import DragDrop from '@/components/DragDrop.vue';
   import { IProductsControllers } from '@/controllers/interfaces/IProductsControllers';
   import { CategoryProducts } from '@/models/entities/CategoryProducts';
-  import { ref,inject, computed, watch, onMounted, nextTick,onUnmounted } from 'vue';
+  import { ref,inject, computed, watch, onMounted, nextTick,onUnmounted, onBeforeUnmount } from 'vue';
 
   const productsControllers = inject<IProductsControllers>('productsControllers');
     if (!productsControllers) {
@@ -107,31 +118,46 @@
     {
       title: 'ID',
       align: 'start',
-      key: 'id_category',
+      key: 'id_category', sortable: false 
     },
-    { title: 'Nome Categoria', key: 'nome' },
+    { title: 'Nome Categoria', key: 'nome', sortable: false  },
     { title: 'Ações Categoria', key: 'actions', align: 'center', sortable: false },
   ];
   
   const desserts = ref<CategoryProducts[]>();
   const editedIndex = ref<boolean>(false);
-  
+  const msg = ref<any>({
+    title:'',
+    text:'',
+    type:'success'
+  })
+  const ativarMsg = ref(false)
+  const index = computed(()=>{
+    if(!desserts.value){
+      return 99
+    }
+    return desserts.value.length + 1
+  })
+
   const editedItem = ref<CategoryProducts>({
     id_category:'',
     nome:'',
+    index:index.value
   });
 
   const itemPadrao = ref<CategoryProducts>({
     id_category:'',
     nome:'',
+    index:index.value
   });
 
   // Computed
   const formTitle = computed(() =>
     
     editedIndex.value === false ? 'Novo Categoria' : 'Editar Categoria'
+    
   );
-  
+ 
   // Watchers
   watch(dialog, (val) => {
     if (!val) close();
@@ -144,8 +170,8 @@
   // Métodos
   const initialize = async () => {
     await productsControllers.lerTodasCategorias('cadastroCategorias', (categories:CategoryProducts[]) => {
-        console.log(categories);
         desserts.value = categories; // Atualiza automaticamente o array de categorias
+        editedItem.value.index = index.value
     });
   }
   const editItem = (item:CategoryProducts) => {
@@ -162,7 +188,9 @@
   
   const deleteItemConfirm = async () => {
     if(editedItem.value != null){
-      await productsControllers.deletarCategoria(editedItem.value.id_category)
+      const retorno = await productsControllers.deletarCategoria(editedItem.value.id_category)
+      msg.value = retorno
+      ativarMsg.value = true
       closeDelete();
         
     }
@@ -186,9 +214,9 @@
   
   const save = async () => {
     if (editedIndex.value && editedItem.value != null) {
-        await productsControllers.editarCategoria(editedItem.value.id_category,editedItem.value.nome)
+        await productsControllers.editarCategoria(editedItem.value.id_category,editedItem.value.nome,editedItem.value.index)
     }else if(editedItem.value != null){
-        await productsControllers.cadastrarCategoria(editedItem.value?.nome)
+        await productsControllers.cadastrarCategoria(editedItem.value?.nome, editedItem.value.index)
     }
     close();
   };
@@ -201,6 +229,10 @@
 onUnmounted(() => {
   productsControllers.stopListeningCategory('cadastroCategorias')
 });
+
+onBeforeUnmount(()=>{
+  productsControllers.stopListeningCategory('cadastroCategorias')
+})
 
   </script>
   

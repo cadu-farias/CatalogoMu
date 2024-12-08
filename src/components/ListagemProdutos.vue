@@ -7,22 +7,30 @@
           class="mb-5"
           max-width="200"
           min-width="200"
-          v-for="(item, index) in produtosExibir"
+          v-for="(item) in produtosExibir"
           :key="item.id_prod"
           :elevation="3"
         >
         <v-skeleton-loader  :loading="loading" type="card" >
+          <v-badge
+          color="red"
+          overlap
+          content="Destaque"
+          class="badge-destaque"
+          v-if="item.destaque"
+        ></v-badge>
           <v-img
             @click="openModal(item)"
             role="button"
             class="cursor-pointer"
-            height="200px"
+            height="155px"
             :src="item.img"
+            cover
             
           ></v-img>
         </v-skeleton-loader>
           <v-card-title v-if="!loading">
-            {{ item.nome }}
+              {{ item.nome }}
           </v-card-title>
         
           <v-card-subtitle >
@@ -48,7 +56,7 @@
               text="Comprar"
               color="green"
               variant="flat"
-              :href="`https://wa.me/558699700524?text=Olá%2C%20gostaria%20de%20saber%20mais%20informações%20do%20Item:%0A%0A*${item.nome}*%0A%0AValor:%20R$%20${item.valor}%0A%0Ahttps://10.0.0.2:3000/produtos/${item.id_prod}%0A%0A_Obrigado!_`"
+              :href="`https://wa.me/558699700524?text=Olá%2C%20gostaria%20de%20saber%20mais%20informações%20do%20Item:%0A%0A*${item.nome}*%0A%0AValor:%20${!dollarOn ? 'R$': '$'}%20${!dollarOn ? item.valor: item.valorDollar}%0A%0A${domain}/produtos/${item.id_prod}%0A%0A_Obrigado!_`"
               target="_blank"
             ></v-btn>
   
@@ -65,7 +73,7 @@
       </v-skeleton-loader>
       
       <!-- Modal para exibir a imagem em tamanho grande -->
-    <v-dialog v-model="modalOpen" max-width="600px">
+    <v-dialog v-model="modalOpen" max-width="780px">
       <v-card>
         <v-img
           v-if="selectedProduct"
@@ -74,7 +82,7 @@
         ></v-img>
         <v-card-title>{{ selectedProduct?.nome }}</v-card-title>
         <v-card-actions>
-          <v-btn color="red" text @click="modalOpen = false">Fechar</v-btn>
+          <v-btn color="red" text="true" @click="modalOpen = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -95,42 +103,77 @@
             ></iframe>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="red" text @click="modalOpenVideo = false">Fechar</v-btn>
+            <v-btn color="red" text='true' @click="modalOpenVideo = false">Fechar</v-btn>
           </v-card-actions>
         </v-card>
     </v-dialog>
     </div>
 </template>
 
-<script setup>
-    import { ref, watch } from 'vue';
-    const loading = ref(true)
-    const modalOpen = ref(false)
-    const selectedProduct = ref(null)
-    const modalOpenVideo = ref(false)
-    const dollarOn = ref(false)
-    // Função para abrir o modal com o produto selecionado
-    function openModal(item) {
-        selectedProduct.value = item
-        modalOpen.value = true
-    }
-    function openModalVide(item) {
-        selectedProduct.value = item
-        modalOpenVideo.value = true
-    }
-    function extractVideoId(url) {
-        const videoIdMatch = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)
-        return videoIdMatch ? videoIdMatch[1] : ''
-    }
-    const props = defineProps({
-        produtosExibir:{
-            required:true,
-        }
-    })
-    watch(props, (val)=>{
-      console.log(val)
-      if(val.produtosExibir != null){
-        loading.value = false
-      }
-    })
+<script setup lang="ts">
+import { ref, onMounted, PropType, watch } from 'vue';
+
+type Produto = {
+  id_prod: string;
+  nome: string;
+  img: string;
+  video: string;
+  valor: number;
+  valorDollar: number;
+  categoria_id: string;
+  destaque?: boolean;
+};
+
+const loading = ref(true);
+const modalOpen = ref(false);
+const selectedProduct = ref<Produto | null>(null);
+const modalOpenVideo = ref(false);
+const dollarOn = ref(false);
+const domain = ref("");
+
+onMounted(() => {
+  if (typeof window !== "undefined") {
+    domain.value = window.location.origin;
+  }
+});
+
+function openModal(item: Produto) {
+  selectedProduct.value = item;
+  modalOpen.value = true;
+}
+
+function openModalVide(item: Produto) {
+  selectedProduct.value = item;
+  modalOpenVideo.value = true;
+}
+
+function extractVideoId(url: string): string {
+  const videoIdMatch = url.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+  return videoIdMatch ? videoIdMatch[1] : '';
+}
+
+const props = defineProps({
+  produtosExibir: {
+    required: true,
+    type: Array as PropType<Produto[]>
+  }
+});
+
+watch(() => props.produtosExibir, (newVal) => {
+  if (newVal) {
+    loading.value = false;
+  }
+});
 </script>
+
+
+<style scoped>
+.badge-destaque {
+  position: absolute;
+  top: 10px; /* 142 */
+  left: 8px; /* 153 */
+  font-weight: bold;
+  color: white;
+  z-index: 899;
+}
+</style>

@@ -24,7 +24,6 @@
                 class="ma-2"
                 rounded
                 base-color="black"
-              
               @click="filtrarPorCategoria(n.id_category)"
             >
               {{ n.nome }}

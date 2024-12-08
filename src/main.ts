@@ -14,6 +14,10 @@ import { IProductsRepository } from "./models/repository/interfaces/IProductsRep
 import { FirebaseProductsRepository } from "./models/repository/FirebaseProductsRepository";
 import { ICotacaoDollar } from "./models/services/ICotacaoDollar";
 import { CotacaoDollar } from "./models/services/CotacaoDollar";
+import { ISettingsControllers } from "./controllers/interfaces/ISettingsControllers";
+import { SettingsControllers } from "./controllers/SettingsControllers";
+import { IConfiguracoes } from "./models/repository/interfaces/IConfiguracoes";
+import { FirebaseConfiguracoes } from "./models/repository/FirebaseConfiguracoes";
 // Components
 
 // Cria uma instância do serviço de autenticação Firebase
@@ -34,8 +38,14 @@ const productsControllers : IProductsControllers = ProductsControllers.getInstan
 // Cria uma instância do controlador de autenticação de usuários
 const authUserControllers: IAuthUserControllers = new AuthUserControllers(authService, userRepository);
 
+// Cria uma instância do repositorio Configurações
+
+const configuracoes: IConfiguracoes = new FirebaseConfiguracoes();
+
+// cria uma instância do controlador de Settings
+const settingsControllers:ISettingsControllers = SettingsControllers.getInstance(configuracoes);
 // Cria uma instância da visualização principal da aplicação
-const viewDipVue: IViewDip = new ViewDipVue(authUserControllers, productsControllers, cotacaoDollarService);
+const viewDipVue: IViewDip = new ViewDipVue(authUserControllers, productsControllers, cotacaoDollarService, settingsControllers);
 
 // Executa a lógica da visualização principal
 viewDipVue.run();

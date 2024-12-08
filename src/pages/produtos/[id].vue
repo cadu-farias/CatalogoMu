@@ -81,12 +81,10 @@
 
   const initialize = async () => {
     const id = route.params.id as string
-    console.log(typeof(id))
     const produtoNew = await productsControllers.getProductId(id)
     if(produtoNew != undefined){
       produto.value = produtoNew
     }
-    console.log(produtoNew)
   };
 
       

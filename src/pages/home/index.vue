@@ -1,20 +1,8 @@
 <template>
-    <v-container  class="bg-surface-variant">
-      <v-row
-          align="center"
-          justify="center"
-          style="height: 150px;"
-          no-gutters
-        >
-          <v-col
-            v-for="n in 3"
-            :key="n"
-          >
-            <v-sheet class="pa-2 ma-2">
-              teste
-            </v-sheet>
-          </v-col>
-        </v-row>
+    <v-container  class="d-flex justify-center align-center" style="height: 100dvh;">
+      <div>
+        <p>Em Desenvolvimento ...</p>
+      </div>
     </v-container>
   </template>
   
