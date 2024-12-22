@@ -4,7 +4,7 @@
         <v-app-bar-nav-icon v-if="usuario" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <v-app-bar-title>
           <v-btn icon size="48" href="/">
-            <img src="@/assets/logo.png" alt="logoInstagram" width="48">
+            <img src="@/assets/LOGO.png" alt="logoInstagram" width="48">
           </v-btn>
         </v-app-bar-title>
         <template #append>
