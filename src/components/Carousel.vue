@@ -1,84 +1,132 @@
 <template>
     <header id="carrosel">
     <div class="d-flex justify-end flex-wrap-reverse">
-    <div class="d-flex justify-center flex-grow-1 flex-shrink-0" style="min-width: 100px; max-width: 100%;">
-      <v-skeleton-loader min-height="300" min-width="800px" :loading="loading" type="ossein" >
+      <v-skeleton-loader v-if="loadingAnuncio" min-height="300px" min-width="300px" :loading="loadingAnuncio" type="ossein" >
+      </v-skeleton-loader>
+          <v-carousel
+          v-if="!loadingAnuncio"
+          height="300"
+          class="mb-md-6"
+          :show-arrows="false"
+          cycle
+          hide-delimiter-background
+          style="max-width: 300px;"
+          
+        >
+          <template
+            v-for="item in anuncios"
+            :key="item.id"
+          >
+              <v-carousel-item
+                v-if="!item.direction && item.ativo"
+              >
+                <a :href="item.link" target="_blank">
+    
+                  <div class="d-flex fill-height justify-center align-center">
+                    <div class="text-h2">
+                      <v-card 
+                        max-width="400"
+                        min-width="450"
+                        
+                      >
+                        <v-img :src="item.img">
+                        </v-img>
+                      </v-card>
+                    </div>
+                  </div>
+                </a>
+               
+              </v-carousel-item>
 
+          </template>
+        </v-carousel>
+        
+      
+    <div class="d-flex justify-center flex-grow-1 flex-shrink-0" style="min-width: 100px; max-width: 100%;">
+
+      <v-skeleton-loader v-if="loading" min-height="300" min-width="600px" :loading="loading" type="ossein" >
+      </v-skeleton-loader>  
       
       <v-carousel
+        v-if="!loading"
         id="carousel-principal"
-        class="me-7 mt-7 mb-6"
+        class="mt-7 mb-6"
         height="300"
         :show-arrows="false"
         cycle
         hide-delimiter-background
         style="max-width: 800px; background: rgba(0,0,0,0);"
       >
-      
+      <template
+      v-for="item in carouselImages"
+          :key="item.id"
+      >
+
         <v-carousel-item
-          v-for="(item, index) in carouselImages"
-          :key="index"
+          v-if="item.ativo"
           
         >
-          <v-sheet
-            color="rgba(0,0,0,0)"
-            height="100%"
-          >
-            <div class="d-flex fill-height justify-center align-center">
-              <div class="text-h2">
-                <v-card 
-                  min-width="700"
-                >
-                  <v-img :aspect-ratio="1" :src="item.img" />
-                </v-card>
-              </div>
+        <a :href="`https://wa.me/558699700524?text=Olá%2C%20gostaria%20de%20saber%20mais%20informações%20da%0A%0A*${item.nome}*%0A%0A_Obrigado!_`"
+        target="_blank">
+        <v-sheet
+          color="rgba(0,0,0,0)"
+          height="100%"
+        >
+          <div class="d-flex fill-height justify-center align-center">
+            <div class="text-h2">
+              <v-card 
+                min-width="700"
+              >
+                <v-img :aspect-ratio="1" :src="item.img" />
+              </v-card>
             </div>
-          </v-sheet>
+          </div>
+        </v-sheet>
+      </a>
         </v-carousel-item>
+      </template>
       </v-carousel>
-    </v-skeleton-loader>
     </div>
 
-    <v-skeleton-loader height="300" min-width="300px" :loading="loadingAnuncio" type="ossein" >
-      <v-sheet
-          class="ms-7 mt-7 mb-6"
-          style="background: rgba(0,0,0,0);"
-          min-width="300"
-        >
+    <v-skeleton-loader v-if="loadingAnuncio" min-height="300" min-width="300px" :loading="loadingAnuncio" type="ossein" >
+    </v-skeleton-loader>
         <v-carousel
+        v-if="!loadingAnuncio"
         height="300"
+        class="mb-md-6"
         :show-arrows="false"
         cycle
         hide-delimiter-background
         style="max-width: 300px;"
         
       >
-        <v-carousel-item
-          v-for="(item, index) in anuncios"
-          :key="index"
-          
-        >
-          <v-sheet
-            color="rgba(0,0,0,0)"
-            height="100%"
+      <template
+            v-for="item in anuncios"
+            :key="item.id"
           >
-            <div class="d-flex fill-height justify-center align-center">
-              <div class="text-h2">
-                <v-card 
-                  max-width="400"
-                  min-width="450"
-                  
-                >
-                  <v-img :src="item.img">
-                  </v-img>
-                </v-card>
-              </div>
-            </div>
-          </v-sheet>
-        </v-carousel-item>
+              <v-carousel-item
+                v-if="item.direction && item.ativo"
+              >
+                <a :href="item.link" target="_blank">
+    
+                  <div class="d-flex fill-height justify-center align-center">
+                    <div class="text-h2">
+                      <v-card 
+                        max-width="400"
+                        min-width="450"
+                        
+                      >
+                        <v-img :src="item.img">
+                        </v-img>
+                      </v-card>
+                    </div>
+                  </div>
+                </a>
+               
+              </v-carousel-item>
+
+          </template>
       </v-carousel>
-      </v-sheet>
-    </v-skeleton-loader>
     </div>
       
   </header>
@@ -133,7 +181,11 @@ const carouselImages = computed(() => {
     return carousel.value.map(item => {
       
       return {
-        img: window.innerWidth >= 450 ? item.imgDesktop : item.imgMobile
+        id:item.id,
+        nome:item.nome,
+        img: window.innerWidth >= 450 ? item.imgDesktop : item.imgMobile,
+        ativo:item.ativo
+
       };
     });
   });
@@ -174,7 +226,7 @@ onMounted(() => {
     }
     #carousel-principal {
       margin: 0 auto; /* Centraliza no mobile */
-      height: auto; /* Ajusta altura dinamicamente */
+      height: 350px !important; /* Ajusta altura dinamicamente */
       max-width: 400px !important;
     }
   }

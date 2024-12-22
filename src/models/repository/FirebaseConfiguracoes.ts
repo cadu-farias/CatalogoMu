@@ -17,14 +17,15 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
     private unsub:any = {}
     private unsubAnuncio:any = {}
 
-    async createBanner(imgDesktop: string, imgMobile: string, ativo: boolean): Promise<Banners> {
+    async createBanner(nome:string,imgDesktop: string, imgMobile: string, ativo: boolean): Promise<Banners> {
         const data =  await addDoc(collection(db,"Banners"),{
+            nome:nome,
             imgDesktop:imgDesktop,
             imgMobile:imgMobile,
             ativo:ativo
         })
 
-        return this.mapBanner(data.id, imgDesktop, imgMobile, ativo)
+        return this.mapBanner(data.id,nome, imgDesktop, imgMobile, ativo)
     }
     async readBanner(updateCallback: (Banners:Banners[])=> void): Promise<void> {
         const q = query(collection(db, "Banners"));
@@ -37,6 +38,7 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
                     banners.push(
                         {
                             id:item.id,
+                            nome:item.data().nome,
                             imgDesktop: item.data().imgDesktop,
                             imgMobile:item.data().imgMobile,
                             ativo:item.data().ativo
@@ -60,9 +62,10 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
         }
     }
 
-    async editBanner(id: string, imgDesktop: string, imgMobile: string, ativo: boolean): Promise<void> {
+    async editBanner(id: string, nome:string, imgDesktop: string, imgMobile: string, ativo: boolean): Promise<void> {
         const docRef = doc(db,'Banners', id);
         await updateDoc(docRef,{
+            nome:nome,
             imgDesktop:imgDesktop,
             imgMobile:imgMobile,
             ativo:ativo
@@ -73,13 +76,15 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
         const docRef = doc(db, "Banners",id)
         await deleteDoc(docRef)
     }
-    async createAnuncio(img: string, ativo: boolean): Promise<Anuncio> {
+    async createAnuncio(img: string, ativo: boolean, direction:boolean, link:string): Promise<Anuncio> {
         const docRef = collection(db, "Anuncios")
         const anuncio = await addDoc(docRef,{
             img:img,
-            ativo:ativo
+            ativo:ativo,
+            direction:direction,
+            link:link
         })
-        return this.mapAnuncio(anuncio.id, img, ativo)
+        return this.mapAnuncio(anuncio.id, img, ativo, direction,link)
         
     }
     async readAnuncio(updateCallback:(anuncio:Anuncio[]) => void): Promise<void> {
@@ -93,7 +98,9 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
                     anuncios.push({
                         id:item.id,
                         img:item.data().img,
-                        ativo:item.data().ativo
+                        ativo:item.data().ativo,
+                        direction:item.data().direction,
+                        link:item.data().link
                     })
                 })
                 updateCallback(anuncios)
@@ -113,11 +120,13 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
         }
     }
 
-    async editAnuncio(id: string, img: string, ativo: boolean): Promise<void> {
+    async editAnuncio(id: string, img: string, ativo: boolean, direction:boolean, link:string): Promise<void> {
         const docRef = doc(db,"Anuncios",id)
         await updateDoc(docRef,{
             img:img,
-            ativo:ativo
+            ativo:ativo,
+            direction:direction,
+            link:link
         })
     }
     async deleteAnuncio(id: string): Promise<void> {
@@ -125,11 +134,11 @@ export class FirebaseConfiguracoes implements IConfiguracoes{
         await deleteDoc(docRef)
     }
     
-    mapBanner(id:string,imgDesktop:string, imgMobile:string,ativo:boolean):Banners{
-        return new Banners(id, imgDesktop, imgMobile,ativo)
+    mapBanner(id:string,nome:string,imgDesktop:string, imgMobile:string,ativo:boolean):Banners{
+        return new Banners(id,nome, imgDesktop, imgMobile,ativo)
     }
-    mapAnuncio(id:string,img:string,ativo:boolean):Anuncio{
-        return new Anuncio(id, img ,ativo)
+    mapAnuncio(id:string,img:string,ativo:boolean, direction:boolean, link:string):Anuncio{
+        return new Anuncio(id, img ,ativo, direction, link)
     }
 
 }

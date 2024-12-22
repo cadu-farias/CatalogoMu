@@ -1,5 +1,5 @@
 <template>
-    <main class="d-flex mt-7 mb-7 flex-wrap justify-center" style="gap: 2rem;">
+    <main v-if="isReady" class="d-flex mt-7 mb-7 flex-wrap justify-center" style="gap: 2rem;">
         <v-card
             min-width="400"
         >
@@ -52,11 +52,12 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, inject } from 'vue';
+  import { ref, onBeforeMount, inject } from 'vue';
   import { useRoute } from 'vue-router';
   import { Products } from '@/models/entities/Products';
   import { IProductsControllers } from '@/controllers/interfaces/IProductsControllers';
-
+import router from '@/router';
+  const isReady = ref(false);
   const productsControllers = inject<IProductsControllers>('productsControllers');
     if (!productsControllers) {
       throw new Error('AuthUserControllers not provided');
@@ -84,6 +85,9 @@
     const produtoNew = await productsControllers.getProductId(id)
     if(produtoNew != undefined){
       produto.value = produtoNew
+      isReady.value = true
+    }else{
+      router.push('/error-404')
     }
   };
 
@@ -95,7 +99,7 @@
         return videoIdMatch ? videoIdMatch[1] : ''
 
         }
-      onMounted(() => {
+        onBeforeMount(() => {
         initialize()
       });
   

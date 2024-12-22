@@ -17,8 +17,21 @@
             event.preventDefault();
         }
         });
+        document.addEventListener('contextmenu', function(e) {
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault(); // Impede o menu contextual nas imagens
+        }
+        });
+
 
     </script>
+
+    <style>
+        img {
+        pointer-events: none; /* Impede qualquer interação com a imagem */
+        }
+
+    </style>
 </head>
 
 <body>

@@ -82,6 +82,15 @@
                   sm="6"
                 >
                   <v-text-field
+                    v-model="bannersDefault.nome"
+                    label="Nome da Promoção"
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <v-text-field
                     v-model="bannersDefault.imgDesktop"
                     label="Link Banner Desktop"
                   ></v-text-field>
@@ -161,10 +170,22 @@
                 >
                   <v-text-field
                     v-model="anunciosDefault.img"
-                    label="Link Anuncio"
+                    label="Imagem Anuncio"
                   ></v-text-field>
                 </v-col>
-
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <v-text-field
+                    v-model="anunciosDefault.link"
+                    label="Link Anuncio"
+                    placeholder="https://exemple.com"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="6">
+                    <v-switch color="green" base-color="error" :label="!anunciosDefault.direction ? 'Esquerda' : 'Direita'" v-model="anunciosDefault.direction" inset></v-switch>
+                  </v-col>
                 <v-col cols="12" md="6" class="d-flex" style="gap: 6px;">
                   <v-btn v-if="!editOnAnuncio"color="success" @click="addAnuncio">Cadastrar</v-btn>
                   <v-btn v-else color="success" @click="saveEdicaoAnuncio" >Salvar</v-btn>
@@ -216,6 +237,7 @@
   const loading = ref<boolean>(false)
   const bannersDefault = ref({
     id:'',
+    nome:'',
     imgDesktop:'',
     imgMobile:'',
     ativo:true
@@ -223,7 +245,9 @@
   const anunciosDefault = ref({
     id:'',
     img:'',
-    ativo:true
+    ativo:true,
+    direction:false,
+    link:''
   })
   const settingsControllers = inject<ISettingsControllers>("settings")
   if (!settingsControllers){
@@ -248,7 +272,7 @@
   }
 
   const addBanner = async ()=>{
-    await settingsControllers.createBanner(bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile, bannersDefault.value.ativo)
+    await settingsControllers.createBanner(bannersDefault.value.nome,bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile, bannersDefault.value.ativo)
     limparCampos()
   }
 
@@ -256,6 +280,7 @@
   const deleteBanner = async (banner:Banners)=>{
     bannersDefault.value = {
       id: banner.id,
+      nome:banner.nome,
       imgDesktop: banner.imgDesktop,
       imgMobile: banner.imgMobile,
       ativo: banner.ativo,
@@ -280,6 +305,7 @@
     // Preenche os campos do formulário com os dados do banner
     bannersDefault.value = {
       id: banner.id,
+      nome:banner.nome,
       imgDesktop: banner.imgDesktop,
       imgMobile: banner.imgMobile,
       ativo: banner.ativo,
@@ -293,16 +319,17 @@
   const inativarBanner = async (banner:Banners)=>{
     bannersDefault.value = {
       id: banner.id,
+      nome:banner.nome,
       imgDesktop: banner.imgDesktop,
       imgMobile: banner.imgMobile,
-      ativo:!banner.ativo,
+      ativo:!banner.ativo
     };
-    await settingsControllers.editBanner(bannersDefault.value.id,bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile,bannersDefault.value.ativo)
+    await settingsControllers.editBanner(bannersDefault.value.id,bannersDefault.value.nome,bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile,bannersDefault.value.ativo)
 
     limparCampos()
   }
   const saveEdicao = async ()=>{
-    await settingsControllers.editBanner(bannersDefault.value.id,bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile,bannersDefault.value.ativo)
+    await settingsControllers.editBanner(bannersDefault.value.id,bannersDefault.value.nome,bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile,bannersDefault.value.ativo)
     editOn.value = false
     limparCampos()
   }
@@ -314,12 +341,13 @@
 
   const limparCampos = ()=>{
     bannersDefault.value.id = ''
+    bannersDefault.value.nome=''
     bannersDefault.value.imgDesktop = ''
     bannersDefault.value.imgMobile = ''
   }
 
   const addAnuncio = async ()=>{
-    await settingsControllers.createAnuncio(anunciosDefault.value.img, anunciosDefault.value.ativo)
+    await settingsControllers.createAnuncio(anunciosDefault.value.img, anunciosDefault.value.ativo, anunciosDefault.value.direction, anunciosDefault.value.link)
     limparCamposAnuncio()
   }
 
@@ -329,6 +357,8 @@
       id: anuncio.id,
       img:anuncio.img,
       ativo: anuncio.ativo,
+      direction: anuncio.direction,
+      link:anuncio.link
     };
     dialogDeleteAnuncio.value = true
   }
@@ -353,6 +383,8 @@
       id: anuncio.id,
       img: anuncio.img,
       ativo: anuncio.ativo,
+      direction: anuncio.direction,
+      link:anuncio.link
     };
 
     // Define a aba ativa como 'newanuncio'
@@ -365,13 +397,15 @@
       id: anuncio.id,
       img: anuncio.img,
       ativo:!anuncio.ativo,
+      direction: anuncio.direction,
+      link:anuncio.link
     };
-    await settingsControllers.editAnuncio(anunciosDefault.value.id,anunciosDefault.value.img,anunciosDefault.value.ativo)
+    await settingsControllers.editAnuncio(anunciosDefault.value.id,anunciosDefault.value.img,anunciosDefault.value.ativo, anunciosDefault.value.direction, anunciosDefault.value.link)
 
     limparCamposAnuncio()
   }
   const saveEdicaoAnuncio = async ()=>{
-    await settingsControllers.editAnuncio(anunciosDefault.value.id,anunciosDefault.value.img,anunciosDefault.value.ativo)
+    await settingsControllers.editAnuncio(anunciosDefault.value.id,anunciosDefault.value.img,anunciosDefault.value.ativo, anunciosDefault.value.direction, anunciosDefault.value.link)
     editOnAnuncio.value = false
     limparCamposAnuncio()
   }
@@ -384,6 +418,8 @@
   const limparCamposAnuncio = ()=>{
     anunciosDefault.value.id = ''
     anunciosDefault.value.img = ''
+    anunciosDefault.value.link = ''
+    anunciosDefault.value.direction = false
   }
   onUnmounted(()=>{
     settingsControllers.pararEscutadorAnuncio()

@@ -19,11 +19,11 @@ export class SettingsControllers implements ISettingsControllers{
         return SettingsControllers.instance;
     }
 
-    async createBanner(imgDesktop: string, imgMobile: string, ativo: boolean): Promise<Banners> {
+    async createBanner(nome:string,imgDesktop: string, imgMobile: string, ativo: boolean): Promise<Banners> {
         if (!this.configuracoes) {
             throw new Error("Configurações não definidas. Não é possível criar um banner.");
         }
-        return await this.configuracoes.createBanner(imgDesktop,imgMobile,ativo)
+        return await this.configuracoes.createBanner(nome,imgDesktop,imgMobile,ativo)
     }
     async readBanner(updateCallback: (banners:Banners[]) => void): Promise<void> {
         if (!this.configuracoes) {
@@ -31,11 +31,11 @@ export class SettingsControllers implements ISettingsControllers{
         }
         this.configuracoes.readBanner(updateCallback)
     }
-    async editBanner(id: string, imgDesktop: string, imgMobile: string, ativo: boolean): Promise<void> {
+    async editBanner(id: string, nome:string,imgDesktop: string, imgMobile: string, ativo: boolean): Promise<void> {
         if (!this.configuracoes) {
             throw new Error("Configurações não definidas. Não é possível criar um banner.");
         }
-        await this.configuracoes.editBanner(id,imgDesktop,imgMobile,ativo)
+        await this.configuracoes.editBanner(id,nome,imgDesktop,imgMobile,ativo)
     }
     async deleteBanner(id: string): Promise<void> {
         if (!this.configuracoes) {
@@ -49,11 +49,11 @@ export class SettingsControllers implements ISettingsControllers{
         }
         this.configuracoes.stopListening()
     }
-    async createAnuncio(img: string, ativo: boolean): Promise<Anuncio> {
+    async createAnuncio(img: string, ativo: boolean, direction:boolean, link:string): Promise<Anuncio> {
         if (!this.configuracoes) {
             throw new Error("Configurações não definidas. Não é possível criar um banner.");
         }
-        return await this.configuracoes.createAnuncio(img,ativo)
+        return await this.configuracoes.createAnuncio(img,ativo, direction, link)
     }
     async readAnuncio(updateCallback: (anuncios:Anuncio[]) => void): Promise<void> {
         if (!this.configuracoes) {
@@ -61,11 +61,11 @@ export class SettingsControllers implements ISettingsControllers{
         }
         await this.configuracoes.readAnuncio(updateCallback)
     }
-    async editAnuncio(id: string, img: string, ativo: boolean): Promise<void> {
+    async editAnuncio(id: string, img: string, ativo: boolean, direction:boolean,link:string): Promise<void> {
         if (!this.configuracoes) {
             throw new Error("Configurações não definidas. Não é possível criar um banner.");
         }
-        await this.configuracoes.editAnuncio(id,img,ativo)
+        await this.configuracoes.editAnuncio(id,img,ativo, direction, link)
     }
     async deleteAnuncio(id: string): Promise<void> {
         if (!this.configuracoes) {

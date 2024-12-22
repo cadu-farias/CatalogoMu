@@ -3,16 +3,35 @@
 
   <main>
     <MenuCategorias :categorias="categorias"  :filtrarPorCategoria="filtrarPorCategoria" :categoriaSelecionada="categoriaSelecionada" />
-
+    <v-card
+        class="mx-auto mt-3"
+        max-width="400"
+        flat
+      >
+      <v-text-field
+            append-inner-icon="mdi-magnify"
+            density="compact"
+            label="Search templates"
+            placeholder="Pesquisar produto"
+            persistent-placeholder
+            variant="outlined"
+            hide-details
+            single-line
+            flat
+            v-model="searchTerm"
+            @input="filtrarPorPesquisa"
+          ></v-text-field>
+      
+      </v-card>
     <ListagemProdutos :produtosExibir="produtosExibir !" />
 
   </main>
 </template>
 
 <script setup lang="ts">
-import Carousel from '../components/Carousel.vue';
-import MenuCategorias from '../components/MenuCategorias.vue';
-import ListagemProdutos from '../components/ListagemProdutos.vue';
+import Carousel from '@/components/Carousel.vue';
+import MenuCategorias from '@/components/MenuCategorias.vue';
+import ListagemProdutos from '@/components/ListagemProdutos.vue';
 import { ref,inject,watch,onUnmounted } from 'vue';
 import { IProductsControllers } from '@/controllers/interfaces/IProductsControllers';
 import { CategoryProducts } from '@/models/entities/CategoryProducts';
@@ -82,10 +101,18 @@ const initialize = async () => {
   const categoriaSelecionada = ref<string | null>(null);
   const produtos = ref<any>()
   const categorias = ref<CategoryProducts[]>()
+  const searchTerm = ref(''); // Termo de pesquisa
 
-  watch(produtos, (val) =>{
+  watch(produtos, (val:any) =>{
     produtosExibir.value = val
   })
+
+  function filtrarPorPesquisa() {
+    const termo = searchTerm.value.toLowerCase();
+    produtosExibir.value = produtos.value.filter((produto:Produto) =>
+       produto.nome.toLowerCase().includes(termo)
+  );
+}
   async function filtrarPorCategoria(categoriaId: string | null) {
   categoriaSelecionada.value = categoriaId;
   if (!produtos.value) return;
@@ -101,7 +128,7 @@ const initialize = async () => {
   );
 
   produtosExibir.value = categoriaId
-    ? produtosComDollar.filter((produto) => produto.categoria_id === categoriaId)
+    ? produtosComDollar.filter((produto:any) => produto.categoria_id === categoriaId)
     : produtosComDollar;
 
 }

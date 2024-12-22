@@ -10,6 +10,7 @@
           v-for="(item) in produtosExibir"
           :key="item.id_prod"
           :elevation="3"
+          v-if="produtosExibir.length > 0"
         >
         <v-skeleton-loader  :loading="loading" type="card" >
           <v-badge
@@ -70,6 +71,14 @@
           </v-card-actions>
         
         </v-card>
+
+        <v-empty-state
+          v-else
+          headline="Ooops!"
+          title="Nenhum Produto encontrado"
+          text="Não foi encontrado produtos com esse nome"
+          image="https://imgur.com/XPZ0hx1.png"
+        ></v-empty-state>
       </v-skeleton-loader>
       
       <!-- Modal para exibir a imagem em tamanho grande -->
