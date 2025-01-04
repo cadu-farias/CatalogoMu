@@ -9,19 +9,19 @@
         </v-app-bar-title>
         <template #append>
           <div v-if="!usuario">
-            <v-btn size="48" href="https://www.instagram.com/criando_itens?igsh=OXhzdmltbnJwMjA2" target="_blank">
+            <v-btn size="48" :href="redes.link_instagram" target="_blank">
               <img src="../assets/instagran.png" alt="logoInstagram" width="34">
             </v-btn>
-            <v-btn size="48" href="https://youtube.com/@criandoitens9281?si=00iiaBDKZmT0fsqt" target="_blank">
+            <v-btn size="48" :href="redes.link_youtube" target="_blank">
               <img src="../assets/youtube.png" alt="logoYouTube" width="34">
             </v-btn>
-            <v-btn size="48" href="https://wa.me/558699700524?text=Olá%2C%20gostaria%20de%20saber%20mais%20informações!" target="_blank">
+            <v-btn size="48" :href="redes.link_whatsapp" target="_blank">
               <img src="../assets/whatsapp.png" alt="logoWhatsapp" width="34">
             </v-btn>
           </div>
           <v-spacer></v-spacer>
   
-          <v-btn v-if="usuario" text @click="deslogar">
+          <v-btn v-if="usuario" @click="deslogar">
             <span>Exit</span>
             <v-icon icon="mdi-exit-to-app" right></v-icon>
           </v-btn>
@@ -40,7 +40,7 @@
         </v-list>
         <template v-slot:append>
           <div class="pa-2">
-            <v-btn class="bg-deep-purple" block v-if="usuario" text @click="deslogar">
+            <v-btn class="bg-deep-purple" block v-if="usuario" @click="deslogar">
               <v-icon icon="mdi-exit-to-app" right></v-icon>
               <span>Exit</span>
             </v-btn>
@@ -53,7 +53,7 @@
           <v-icon>{{ link.icon }}</v-icon>
           <span>{{ link.text }}</span>
         </v-btn>
-        <v-btn v-if="usuario" text @click.stop="drawer = !drawer">
+        <v-btn v-if="usuario" @click.stop="drawer = !drawer">
           <v-icon icon="mdi-menu" right></v-icon>
           <span>Mais</span>
         </v-btn>
@@ -61,17 +61,28 @@
     </nav>
   </template>
   
-  <script setup>
+  <script setup lang="ts">
   import { ref, inject, onBeforeMount, watch, onBeforeUnmount } from 'vue';
   import { useRouter } from 'vue-router';
   import { useDisplay } from 'vuetify'
+  import { ISettingsControllers } from '@/controllers/interfaces/ISettingsControllers';
+  import { IAuthUserControllers } from '@/controllers/interfaces/IAuthUserControllers';
+  import { User } from '@/models/entities/User';
+import { RedesSociais } from '@/models/entities/RedesSociais';
+import { red } from 'vuetify/util/colors';
   
   const { mobile } = useDisplay()
   
   const size = ref(!mobile.value)
   const drawer = ref(false)
-  const usuario = ref(null)
-  const idUser = ref(null)
+  const usuario = ref<User | null>(null)
+  const idUser = ref<string | null>(null)
+  const redes = ref<RedesSociais>({
+    id:"",
+    link_instagram:"",
+    link_youtube:"",
+    link_whatsapp:""
+  })
   
   const links = ref([
     { icon: 'mdi-view-dashboard', text: 'Dashboard', route: '/home' },
@@ -83,11 +94,19 @@
   const router = useRouter()
   
   // Injetando o controlador de autenticação
-  const authUserControllers = inject('authUserControllers')
+  const authUserControllers = inject<IAuthUserControllers>('authUserControllers')
   if (!authUserControllers) {
     throw new Error('authUserControllers não foi injetado corretamente')
   }
   
+  const settingsControllers = inject<ISettingsControllers>("settings")
+  if (!settingsControllers){
+    throw new Error('settingsControllers not provided');
+  }
+  
+  const getRedes = async ()=>{
+    redes.value = await settingsControllers.readSocial()
+  }
   // Função para deslogar
   const deslogar = () => {
     authUserControllers.deslogar()
@@ -130,6 +149,7 @@
   onBeforeMount(async () => {
     await getIdUser()
     await getUser()
+    await getRedes()
     observeAuthState() // Começa a observar o estado de autenticação
   })
   </script>

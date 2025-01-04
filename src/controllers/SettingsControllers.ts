@@ -2,6 +2,7 @@ import { Anuncio } from "@/models/entities/Anuncio";
 import { Banners } from "@/models/entities/Banners";
 import { ISettingsControllers } from "./interfaces/ISettingsControllers";
 import { IConfiguracoes } from "@/models/repository/interfaces/IConfiguracoes";
+import { RedesSociais } from "@/models/entities/RedesSociais";
 
 export class SettingsControllers implements ISettingsControllers{
 
@@ -76,6 +77,28 @@ export class SettingsControllers implements ISettingsControllers{
 
     pararEscutadorAnuncio(): void {
         this.configuracoes?.stopListeningAnuncio()
+    }
+
+    async createSocial(link_instagram: string, link_youtube: string, link_whatsapp: string): Promise<RedesSociais> {
+        if (!this.configuracoes) {
+            throw new Error("Configurações não definidas. Não é possível criar um banner.");
+        }
+        return await this.configuracoes.createSocial(link_instagram,link_youtube,link_whatsapp)
+    }
+    async readSocial(): Promise<RedesSociais> {
+        if (!this.configuracoes) {
+            throw new Error("Configurações não definidas. Não é possível criar um banner.");
+        }
+        return this.configuracoes.readSocial()
+    }
+    async editSocial(id: string, link_instagram: string, link_youtube: string, link_whatsapp: string): Promise<void> {
+        if (!this.configuracoes) {
+            throw new Error("Configurações não definidas. Não é possível criar um banner.");
+        }
+        this.configuracoes.editSocial(id,link_instagram,link_youtube,link_whatsapp)
+    }
+    async deleteSocial(id: string): Promise<void> {
+        this.configuracoes?.deleteSocial(id)
     }
 
 }

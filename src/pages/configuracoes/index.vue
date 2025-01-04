@@ -14,6 +14,7 @@
       <v-tab value="newBanner">Novo Banner</v-tab>
       <v-tab value="listAnuncio" @click="cancelarEdicaoAnuncio">Listagem Anuncios</v-tab>
       <v-tab value="newAnuncio">Novo Anuncios</v-tab>
+      <v-tab value="listRedesSociais">Redes Sociais</v-tab>
       
     </v-tabs>
 
@@ -196,6 +197,55 @@
 
           </v-form>
         </v-tabs-window-item>
+        <v-tabs-window-item value="listRedesSociais">
+          <v-alert
+            :text="redeMessage.msg"
+            :title="redeMessage.title"
+            type="success"
+            closable
+            v-if="redeMessage.isActive"
+          ></v-alert>
+          <v-form>
+            <v-container>
+              <v-row>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <v-text-field
+                    v-model="redes.link_instagram"
+                    label="Link Instagram"
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <v-text-field
+                    v-model="redes.link_youtube"
+                    label="Link Youtube"
+                    placeholder="https://exemple.com"
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <v-text-field
+                    v-model="redes.link_whatsapp"
+                    label="Link Whatsapp"
+                    placeholder="https://exemple.com"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" md="6" class="d-flex" style="gap: 6px;">
+                  <v-btn v-if="redes.id == ''"color="success" @click="addSocial">Cadastrar</v-btn>
+                  <v-btn v-else color="success" @click="editSocial">Salvar</v-btn>
+                </v-col>
+              </v-row>
+            </v-container>
+
+          </v-form>
+        </v-tabs-window-item>
       </v-tabs-window>
     </v-card-text>
   </v-card>
@@ -228,6 +278,7 @@
   import { ISettingsControllers } from '@/controllers/interfaces/ISettingsControllers';
   import { Banners } from '@/models/entities/Banners';
   import { Anuncio } from '@/models/entities/Anuncio';
+import { RedesSociais } from '@/models/entities/RedesSociais';
   const banners = ref<Banners[]>([])
   const anuncios = ref<Anuncio[]>([])
   const editOn = ref<boolean>(false)
@@ -235,6 +286,17 @@
   const dialogDelete = ref<boolean>(false)
   const dialogDeleteAnuncio = ref<boolean>(false)
   const loading = ref<boolean>(false)
+  const redeMessage = ref({
+    title:"",
+    msg:'',
+    isActive:false
+  })
+  const redes = ref<RedesSociais>({
+    id:'',
+    link_instagram: '',
+    link_youtube: '',
+    link_whatsapp: ''
+  })
   const bannersDefault = ref({
     id:'',
     nome:'',
@@ -249,6 +311,7 @@
     direction:false,
     link:''
   })
+  const social = ref()
   const settingsControllers = inject<ISettingsControllers>("settings")
   if (!settingsControllers){
     throw new Error('settingsControllers not provided');
@@ -269,7 +332,25 @@
     await settingsControllers.readAnuncio((anuncio:Anuncio[])=>{
       anuncios.value = anuncio
     })
+    redes.value = await settingsControllers.readSocial()
   }
+
+  const addSocial = async ()=>{
+    await settingsControllers.createSocial(redes.value.link_instagram, redes.value.link_youtube,redes.value.link_whatsapp)
+    redeMessage.value.msg = "Redes Sociais Adicionadas Com Sucesso!"
+    redeMessage.value.title = "Links gravados com sucesso"
+    redeMessage.value.isActive = true
+
+
+  }
+
+  const editSocial = async ()=>{
+    await settingsControllers.editSocial(redes.value.id,redes.value.link_instagram, redes.value.link_youtube,redes.value.link_whatsapp)
+    redeMessage.value.msg = "Redes Sociais Alteradas Com Sucesso!"
+    redeMessage.value.title = "Alterações gravados com sucesso"
+    redeMessage.value.isActive = true
+  }
+
 
   const addBanner = async ()=>{
     await settingsControllers.createBanner(bannersDefault.value.nome,bannersDefault.value.imgDesktop,bannersDefault.value.imgMobile, bannersDefault.value.ativo)

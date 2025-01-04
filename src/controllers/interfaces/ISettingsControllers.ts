@@ -1,5 +1,6 @@
 import { Anuncio } from "@/models/entities/Anuncio"
 import { Banners } from "@/models/entities/Banners"
+import { RedesSociais } from "@/models/entities/RedesSociais"
 
 export interface ISettingsControllers{
     createBanner(nome:string,imgDesktop:string,imgMobile:string,ativo:boolean):Promise<Banners>
@@ -21,4 +22,12 @@ export interface ISettingsControllers{
     deleteAnuncio(id:string):Promise<void>
 
     pararEscutadorAnuncio():void
+    
+    createSocial(link_instagram:string,link_youtube:string,link_whatsapp:string):Promise<RedesSociais>
+    
+    readSocial():Promise<RedesSociais>
+    
+    editSocial(id:string,link_instagram:string,link_youtube:string,link_whatsapp:string):Promise<void>
+    
+    deleteSocial(id:string):Promise<void>
 }
