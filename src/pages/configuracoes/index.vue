@@ -311,7 +311,6 @@ import { RedesSociais } from '@/models/entities/RedesSociais';
     direction:false,
     link:''
   })
-  const social = ref()
   const settingsControllers = inject<ISettingsControllers>("settings")
   if (!settingsControllers){
     throw new Error('settingsControllers not provided');

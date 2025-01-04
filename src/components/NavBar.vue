@@ -69,7 +69,7 @@
   import { IAuthUserControllers } from '@/controllers/interfaces/IAuthUserControllers';
   import { User } from '@/models/entities/User';
 import { RedesSociais } from '@/models/entities/RedesSociais';
-import { red } from 'vuetify/util/colors';
+
   
   const { mobile } = useDisplay()
   
